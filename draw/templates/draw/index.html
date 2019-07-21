@@ -19,7 +19,9 @@
     <canvas id="myCanvas" width="750px" height="750px"></canvas>
 </body>
 <script>
-
+ 
+ window.onload = function() {
+//    	window.addEventListener ("touchmove", function (event) { event.preventDefault (); }, false);
     // setting up the canvas and one paper tool
     var canvas = document.getElementById('myCanvas');
     paper.setup(canvas);
@@ -27,10 +29,70 @@
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
-
+    var path;
+    var json;
+    tool.onMouseDown = function(event){
+      path = new paper.Path();
+      path.add(event.point);
+//       var obj = {x:event.point.x, y:event.point.y};
+//       var myJSON = JSON.stringify(obj);
+//       socket.send(myJSON);
+      }
+    
+    tool.onMouseDrag = function(event){
+//       path = new paper.Path();
+//       path.add(event.point);
+      
+//       var obj = {x:event.point.x, y:event.point.y};
+//       var myJSON = JSON.stringify(obj);
+//       socket.send(myJSON);
+      //path.smooth();
+         
+    }
     // var socket = new WebSocket(
-    //     'wss://<your url here>/ws/draw');
+    //     'wss://<yoururl here>/ws/draw');
 
+    // create a new websocket connecting to the server
+    var socket = new WebSocket('wss://p3-websockets-zding52-zding52366227.codeanyapp.com/ws/draw');
+   
+    socket.onopen = function(e) {
+    alert("[open] Connection established, send -> server");
+    //socket.send("My name is Maggie");
+    };
+    // triggered when receiving a message from the server
+    socket.onmessage = function(receivedMessage) {
+//       if(typeOf receivedMessage.data === String){
+        //create JSON 
+//         var json = JSON.parse(receivedMessage.data);
+//         var posx = json.x;
+//         var posy = json.y;
+//         path.add(posx,posy);
+        //console.log(posx);
+        //console.log(posy);
+//       }
+//       path = new paper.Path();
+//       path.strokeColor = '#00000';
+//       path.add(posx,posy);
+      //path = new paper.Path();
+      //alert(receivedMessage);
+      //path.add(new Point(receivedMessage[0],receivedMessage[1]));
+      //
+      //alert('[message] Data received: ${event.data} <- server');
+      
+      // do something when you receive a message
+    };
 
+    // use when sending a message to the server
+    // to be broadcasted to all clients, please add a delay
+    //socket.send("test");
+
+    // notify console if socket closes unexpectedly
+    socket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+    socket.onerror = function(error) {
+    alert(`[error] ${error.message}`);
+    };
+ }
 </script>
 </html>
