@@ -27,19 +27,20 @@
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
-    var path;
+    var path= new paper.Path();
+    var userColor  = paper.Color.random();
 //     var json;
-    tool.onMouseDown = function(event){
-      path = new paper.Path();
-//       path.strokeColor = '#00000';
-//       path.add(event.point);
+//     tool.onMouseDown = function(event){
+//       path = new paper.Path();
+// //       path.strokeColor = '#00000';
+// //       path.add(event.point);
        
-      var obj = {x:event.point.x, y:event.point.y};
-      var myJSON = JSON.stringify(obj);
-      socket.send(myJSON);
-      }
-     tool.onMouseDrag = function(event){
-      path = new paper.Path();
+//       var obj = {x:event.point.x, y:event.point.y};
+//       var myJSON = JSON.stringify(obj);
+//       socket.send(myJSON);
+//       }
+     tool.onMouseMove  = function(event){
+//       path = new paper.Path();
 //       path.strokeColor = '#00000';
 //       path.add(event.point);
       
@@ -59,14 +60,23 @@
         var json = JSON.parse(receivedMessage.data);
         var posx = json.x;
         var posy = json.y;
-       path.strokeColor = '#00000';
+       path.strokeColor = userColor;//'#00000';
+//        path.strokeColor = 
+//        path.fillColor = {
+// 		hue: Math.random() * 360,
+// 		saturation: 1,
+// 		brightness: 1
+// 	};
+       
         path.add(posx,posy);
         
-//         console.log(posx);
-//         console.log(posy);
+        console.log(posx, posy);
+        
 
     };
-
+//  path.strokeColor = '#00000';
+//         path.add(posx,posy);
+  
     socket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
     };
