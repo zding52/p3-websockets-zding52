@@ -19,97 +19,53 @@
     <canvas id="myCanvas" width="750px" height="1250px"></canvas>
 </body>
 <script>
-//     function getRandomColor() {
-//   var letters = '0123456789ABCDEF';
-//   var color = '#';
-//   for (var i = 0; i < 6; i++) {
-//     color += letters[Math.floor(Math.random() * 16)];
-//   }
-//   return color;
-// }
+
     // setting up the canvas and one paper tool
     var canvas = document.getElementById('myCanvas');
     var paths= {};
     paper.setup(canvas);
     var tool = new paper.Tool();
-
+    var id = Math.random()*360; 
+    var userColor = new paper.Color.random();
+    //paths[id] = new paper.Path;
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
-//     var path= new paper.Path();
-    var path;
-    var userColor  = paper.Color.random();
-   path = new paper.Path();
-//     var json;
-//     tool.onMouseDown = function(event){
-//       path = new paper.Path();
-// //       path.strokeColor = '#00000';
-// //       path.add(event.point);
-       
-//       var obj = {x:event.point.x, y:event.point.y};
-//       var myJSON = JSON.stringify(obj);
-//       socket.send(myJSON);
-//       }
+
    tool.onMouseMove  = function(event){
-//       path = new paper.Path();
-//       path.strokeColor = '#00000';
-//       path.add(event.point);
-     
-      var obj = {x:event.point.x, y:event.point.y, color: userColor};
+
+      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor};
       var myJSON = JSON.stringify(obj);
-      socket.send(myJSON);
-      //path.smooth();
-         
+      socket.send(myJSON);       
     }  
-//   tool.onMouseDrag  = function(event){
-// //       path = new paper.Path();
-// //       path.strokeColor = '#00000';
-// //       path.add(event.point);
-      
-//       var obj = {x:event.point.x, y:event.point.y, color: userColor};
-//       var myJSON = JSON.stringify(obj);
-//       socket.send(myJSON);
-//       //path.smooth();
-         
-//     }
-    
+
 
     // var socket = new WebSocket(
     //     'wss://<your url here>/ws/draw');
     var socket = new WebSocket('wss://p3-websockets-zding52-zding52366227.codeanyapp.com/ws/draw');
      socket.onmessage = function(receivedMessage) {
-//       if(typeOf receivedMessage.data === String){
-        //create JSON 
-//        path = new paper.Path();
-       
+
         var json = JSON.parse(receivedMessage.data);
         var posx = json.x;
         var posy = json.y;
-        var color = json.color;
-       //console.log(color);
-       //path.strokeColor = color;//'#00000';
-       path.strokeColor = new paper.Color(color[1],color[2],color[3]);
-//        path.strokeColor = 
-//        path.fillColor = {
-// 		hue: Math.random() * 360,
-// 		saturation: 1,
-// 		brightness: 1
-// 	};
-//         var newpath = new paper.Path();
-        path.add(posx,posy);
-        
-        
-        
+        var myid = json.userid;
+        var color = json.mycolor;
+   if(!(myid in paths)){
+     newpath = new paper.Path();
+     paths[myid] = newpath;
+   }
+       
+       paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);
+       
+        paths[myid].add(new paper.Point(posx,posy));
 
-    };
-//  path.strokeColor = '#00000';
-//         path.add(posx,posy);
-  
-    socket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
-    socket.onerror = function(error) {
-    alert(`[error] ${error.message}`);
-    };
+    }
+
+//     socket.onclose = function(e) {
+//         console.error('Chat socket closed unexpectedly');
+//     };
+//     socket.onerror = function(error) {
+//     alert(`[error] ${error.message}`);
+//     };
 
 
 </script>
