@@ -30,6 +30,16 @@
     //paths[id] = new paper.Path;
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
+  //URL <your url>:8000/draw/?size=small
+  //<your url>:8000/draw/?size=large.
+    var isSmall = false;
+    if (url.indexOf("small") > -1) {
+      isSmall = true;
+    } else if (url.indexOf("large") > -1) {
+      isSmall = false;
+    } else {
+      alert('<your url>:8000/draw/?size=small or <your url>:8000/draw/?size=large');
+    }
 
    tool.onMouseMove  = function(event){
 
@@ -43,7 +53,7 @@
     //     'wss://<your url here>/ws/draw');
     var socket = new WebSocket('wss://p3-websockets-zding52-zding52366227.codeanyapp.com/ws/draw');
      socket.onmessage = function(receivedMessage) {
-
+       
         var json = JSON.parse(receivedMessage.data);
         var posx = json.x;
         var posy = json.y;
@@ -53,8 +63,15 @@
      newpath = new paper.Path();
      paths[myid] = newpath;
    }
-       
-       paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);
+        if(isSmall){
+          if(myid != id){
+            paths[myid].strokeColor = 'white';
+          }
+          else{
+              paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);
+          }
+        }else{
+       paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);}
        
         paths[myid].add(new paper.Point(posx,posy));
 
