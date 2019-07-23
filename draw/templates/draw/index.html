@@ -24,24 +24,13 @@
 </body>
 <script>
     
-    $(document).ready(() => {
-      window.addEventListener('deviceorientation', (event) => {
-//         console.log(Math.trunc(event.beta));
-        //console.log(event.gamma);
-        if(event.gamma > 0){
-//           console.log('right');
-           userColor = new paper.Color.random();
-        }//tilt right
-        
-       console.log(event.acceleration);
-//         $('#beta').text(Math.trunc(event.beta) + ' deg');
-      });
-    });
+    
   </script>  
 <script>
 
     // setting up the canvas and one paper tool
     var canvas = document.getElementById('myCanvas');
+    var shake = false;
     var paths= {};
     paper.setup(canvas);
     var tool = new paper.Tool();
@@ -93,10 +82,36 @@
           }
         }else{
        paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);}
-       
-        paths[myid].add(new paper.Point(posx,posy));
+      
+       paths[myid].add(new paper.Point(posx,posy));
 
     }
+     
+     $(document).ready(() => {
+      window.addEventListener('deviceorientation', (event) => {
+//         console.log(Math.trunc(event.beta));
+        //console.log(event.gamma);
+        if(event.gamma > 0){
+//           console.log('right');
+           userColor = new paper.Color.random();
+        }//tilt right
+        
+       //console.log(event.acceleration.);
+//         $('#beta').text(Math.trunc(event.beta) + ' deg');
+      });
+      window.addEventListener('devicemotion', function(event) {
+      if(event.acceleration.x > 30){
+//         userColor = 'white';
+           delPath();
+//            alert(event.acceleration.x + ' m/s2');
+      }
+      function delPath(){
+          paper.project.activeLayer.removeChildren();
+            paper.view.draw();
+      }
+       
+});
+    });
 
 //     socket.onclose = function(e) {
 //         console.error('Chat socket closed unexpectedly');
