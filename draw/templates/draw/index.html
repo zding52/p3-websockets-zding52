@@ -31,6 +31,7 @@
     // setting up the canvas and one paper tool
     var canvas = document.getElementById('myCanvas');
     var shake = false;
+    var lastGamma = 0;
     var paths= {};
     paper.setup(canvas);
     var tool = new paper.Tool();
@@ -91,16 +92,23 @@
       window.addEventListener('deviceorientation', (event) => {
 //         console.log(Math.trunc(event.beta));
         //console.log(event.gamma);
-        if(event.gamma > 0){
+//         if(event.gamma == 0){
+//           lastGamma = 0;
+//         }
+        if(event.gamma - lastGamma > 40){
 //           console.log('right');
+          console.log(lastGamma);
            userColor = new paper.Color.random();
+          
+          lastGamma = 0;
+          
         }//tilt right
         
        //console.log(event.acceleration.);
 //         $('#beta').text(Math.trunc(event.beta) + ' deg');
       });
       window.addEventListener('devicemotion', function(event) {
-      if(event.acceleration.x > 30){
+      if(event.acceleration.x > 25){
 //         userColor = 'white';
            delPath();
 //            alert(event.acceleration.x + ' m/s2');
