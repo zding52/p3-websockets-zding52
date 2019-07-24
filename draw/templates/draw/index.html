@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'draw/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -18,8 +19,9 @@
     </style>
 
 </head>
-<body>
+<body class="w3-content" style="max-width:1200px">
     <!-- You may change the dimensions of this canvas -->
+    
     <canvas id="myCanvas" width="750px" height="1250px"></canvas>
 </body>
 <script>
@@ -33,6 +35,7 @@
     var shake = false;
     var lastGamma = 0;
     var paths= {};
+    var allUserPath = {};
     paper.setup(canvas);
     var tool = new paper.Tool();
     var id = Math.random()*360; 
@@ -42,21 +45,37 @@
     var url = window.location.href;
   //URL <your url>:8000/draw/?size=small
   //<your url>:8000/draw/?size=large.
-    var isSmall = false;
-    if (url.indexOf("small") > -1) {
-      isSmall = true;
-    } else if (url.indexOf("large") > -1) {
-      isSmall = false;
+    var isHide = false;
+    if (url.indexOf("hide") > -1) {
+      isHide = true;
+    } else if (url.indexOf("show") > -1) {
+      isHide = false;
     } else {
-      alert('<your url>:8000/draw/?size=small or <your url>:8000/draw/?size=large');
+      alert('<your url>:8000/draw/?size=small or <your url>:8000/draw/?type=show');
     }
 
-   tool.onMouseMove  = function(event){
-
-      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor};
+   tool.onMouseDown = function(event){
+//       newpath = new paper.Path();
+//       paths[id] = newpath;
+      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor, newpath:true};
       var myJSON = JSON.stringify(obj);
       socket.send(myJSON);       
     }  
+
+    tool.onMouseDrag = function(event){
+//       newpath = new paper.Path();
+//       paths[id] = newpath;
+      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor,newpath:false};
+      var myJSON = JSON.stringify(obj);
+      socket.send(myJSON);       
+    }  
+    
+//     tool.onMouseUp = function(event){
+
+//       var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor};
+//       var myJSON = JSON.stringify(obj);
+//       socket.send(myJSON);       
+//     }  
 
 
     // var socket = new WebSocket(
@@ -69,57 +88,66 @@
         var posy = json.y;
         var myid = json.userid;
         var color = json.mycolor;
-   if(!(myid in paths)){
-     newpath = new paper.Path();
-     paths[myid] = newpath;
-   }
+        var newp  = json.newpath;
+       if(newp == true){
+         newpath = new paper.Path();
+       paths[myid] = newpath;
+//          console.log("new");
+       }
+//      if (!(myid in paths)) {
+//        newpath = new paper.Path();
+//        paths[myid] = newpath;
+//      }
+       if(!(myid in allUserPath)){
+         allUserPath = paths;
+//          console.log("new");
+       }
        paths[myid].strokeWidth = 10;
-        if(isSmall){
-          if(myid != id){
+        if (isHide) {
+          if (myid != id) {
             paths[myid].strokeColor = 'white';
-          }
-          else{
+          } else {
               paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);
           }
-        }else{
+        } else {
        paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);}
       
        paths[myid].add(new paper.Point(posx,posy));
 
     }
      
-     $(document).ready(() => {
-      window.addEventListener('deviceorientation', (event) => {
-//         console.log(Math.trunc(event.beta));
-        //console.log(event.gamma);
-//         if(event.gamma == 0){
+//      $(document).ready(() => {
+//       window.addEventListener('deviceorientation', (event) => {
+// //         console.log(Math.trunc(event.beta));
+//         //console.log(event.gamma);
+// //         if(event.gamma == 0){
+// //           lastGamma = 0;
+// //         }
+//         if(event.gamma - lastGamma > 40){
+// //           console.log('right');
+//           console.log(lastGamma);
+//            userColor = new paper.Color.random();
+          
 //           lastGamma = 0;
-//         }
-        if(event.gamma - lastGamma > 40){
-//           console.log('right');
-          console.log(lastGamma);
-           userColor = new paper.Color.random();
           
-          lastGamma = 0;
-          
-        }//tilt right
+//         }//tilt right
         
-       //console.log(event.acceleration.);
-//         $('#beta').text(Math.trunc(event.beta) + ' deg');
-      });
-      window.addEventListener('devicemotion', function(event) {
-      if(event.acceleration.x > 25){
-//         userColor = 'white';
-           delPath();
-//            alert(event.acceleration.x + ' m/s2');
-      }
-      function delPath(){
-          paper.project.activeLayer.removeChildren();
-            paper.view.draw();
-      }
+//        //console.log(event.acceleration.);
+// //         $('#beta').text(Math.trunc(event.beta) + ' deg');
+//       });
+// //       window.addEventListener('devicemotion', function(event) {
+// //       if(event.acceleration.x > 25){
+// // //         userColor = 'white';
+// //            delPath();
+// // //            alert(event.acceleration.x + ' m/s2');
+// //       }
+// //       function delPath(){
+// //           paper.project.activeLayer.removeChildren();
+// //             paper.view.draw();
+// //       }
        
-});
-    });
+// // });
+//     });
 
 //     socket.onclose = function(e) {
 //         console.error('Chat socket closed unexpectedly');
