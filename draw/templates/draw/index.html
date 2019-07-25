@@ -17,6 +17,16 @@
       crossorigin="anonymous">
     </script>
     <style type="text/css">
+      #myDIV {
+      border: 1px solid black;
+      margin-bottom: 10px;
+      max-width:230px;  
+      }
+      .box{
+        border: 1px solid black;
+        background-color:white;
+        max-width:230px;
+      }
       #myCanvas {
      
       background-color: black;
@@ -49,12 +59,16 @@
    <div id="respond">
       <div id="content"></div>
         <div>
-<!--             <form action="sendMessageFromChat(document.getElementById('comment').value);"> -->
+            <form class=" w3-right w3-padding-29">
               <br> Comment:<br>
               <input id = "comment" type="text" name="" value="" >
 <!--              <i onclick="javascript:sendMessageFromChat(document.getElementById('comment').value)" class="fa fa-send w3-hide-large w3-button"></i> -->
              <i onclick="sendMessageFromChat(document.getElementById('comment').value);" class="fa fa-send w3-hide-large w3-button"></i>
-<!--             </form> -->
+              <br></br>
+              <div class="w3-left  w3-padding-29"id="myDIV">  
+          </form>
+            
+            </div>
         </div>
 </div>
   
@@ -128,7 +142,7 @@ function w3_close() {
   function sendMessageFromChat(message) {
       commentArray[id] = commentArray[id] + 1; 
     
-      var jsobj = {comment:message,ismessage:true};
+      var jsobj = {comment:message,ismessage:true, mycolor:userColor};
       var messageJson = JSON.stringify(jsobj);
       socket.send(messageJson);
       
@@ -187,14 +201,15 @@ function w3_close() {
      socket.onmessage = function(receivedMessage) {
        
         var json = JSON.parse(receivedMessage.data);
+        var color = json.mycolor;
         var booleanmessage = json.ismessage;
         if(booleanmessage == true){
           var message = json.comment+'\n';
-//           alert(message);
-          var bar = document.getElementById('mySidebar');
+          var bar = document.getElementById('myDIV');
           var newContent = document.createTextNode(message); 
+          
           linebreak = document.createElement("br");
-      
+           
           // add the text node to the newly created div
           bar.appendChild(newContent);
           bar.appendChild(linebreak);
@@ -203,20 +218,15 @@ function w3_close() {
         var posx = json.x;
         var posy = json.y;
         var myid = json.userid;
-        var color = json.mycolor;
+       
         var newp  = json.newpath;
        if(newp == true){
          newpath = new paper.Path();
-       paths[myid] = newpath;
-//          console.log("new");
+         paths[myid] = newpath;
        }
-//      if (!(myid in paths)) {
-//        newpath = new paper.Path();
-//        paths[myid] = newpath;
-//      }
+
        if(!(myid in allUserPath)){
          allUserPath = paths;
-//          console.log("new");
        }
        paths[myid].strokeWidth = 3;
         if (isHide) {
@@ -231,47 +241,8 @@ function w3_close() {
        paths[myid].add(new paper.Point(posx,posy));
 
     }}
-     
-//      $(document).ready(() => {
-//       window.addEventListener('deviceorientation', (event) => {
-// //         console.log(Math.trunc(event.beta));
-//         //console.log(event.gamma);
-// //         if(event.gamma == 0){
-// //           lastGamma = 0;
-// //         }
-//         if(event.gamma - lastGamma > 40){
-// //           console.log('right');
-//           console.log(lastGamma);
-//            userColor = new paper.Color.random();
-          
-//           lastGamma = 0;
-          
-//         }//tilt right
-        
-//        //console.log(event.acceleration.);
-// //         $('#beta').text(Math.trunc(event.beta) + ' deg');
-//       });
-// //       window.addEventListener('devicemotion', function(event) {
-// //       if(event.acceleration.x > 25){
-// // //         userColor = 'white';
-// //            delPath();
-// // //            alert(event.acceleration.x + ' m/s2');
-// //       }
-// //       function delPath(){
-// //           paper.project.activeLayer.removeChildren();
-// //             paper.view.draw();
-// //       }
-       
-// // });
-//     });
-
-//     socket.onclose = function(e) {
-//         console.error('Chat socket closed unexpectedly');
-//     };
-//     socket.onerror = function(error) {
-//     alert(`[error] ${error.message}`);
-//     };
-
+  
+   
 
 </script>
 </html>
