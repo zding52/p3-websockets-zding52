@@ -46,20 +46,17 @@
 <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
   
-    <!-- begin wwww.htmlcommentbox.com -->
- <div id="HCB_comment_box"><a href="http://www.htmlcommentbox.com">HTML Comment Box</a> is loading comments...</div>
- <link rel="stylesheet" type="text/css" href="https://www.htmlcommentbox.com/static/skins/bootstrap/twitter-bootstrap.css?v=0" />
- <script type="text/javascript" id="hcb"> /*<!--*/ 
-   if(!window.hcb_user){
-     hcb_user={};
-   } (
-     function(){var s=document.createElement("script"),
-       l=hcb_user.PAGE || (""+window.location).replace(/'/g,"%27"), h="https://www.htmlcommentbox.com";s.setAttribute("type","text/javascript");
-       s.setAttribute("src", h+"/jread?page="+encodeURIComponent(l).replace("+","%2B")+"&mod=%241%24wq1rdBcg%24t.dI411Bq7DJ7IeaME3CZ1"+"&opts=16862&num=10&ts=1564028197080");
-                                                                   if (typeof s!="undefined") document.getElementsByTagName("head")[0].appendChild(s);}
-   )(); /*-->*/ 
-  </script>
-<!-- end www.htmlcommentbox.com -->
+   <div id="respond">
+      <div id="content"></div>
+        <div>
+<!--             <form action="sendMessageFromChat(document.getElementById('comment').value);"> -->
+              <br> Comment:<br>
+              <input id = "comment" type="text" name="" value="" >
+<!--              <i onclick="javascript:sendMessageFromChat(document.getElementById('comment').value)" class="fa fa-send w3-hide-large w3-button"></i> -->
+             <i onclick="sendMessageFromChat(document.getElementById('comment').value);" class="fa fa-send w3-hide-large w3-button"></i>
+<!--             </form> -->
+        </div>
+</div>
   
   </nav>
   <!-- Top menu on small screens -->
@@ -116,15 +113,29 @@ function w3_close() {
   
    //side bar
   // Open and close sidebar
-function w3_open() {
-  document.getElementById("mySidebar").style.display = "block";
-  document.getElementById("myOverlay").style.display = "block";
-}
- 
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-  document.getElementById("myOverlay").style.display = "none";
-}
+  function w3_open() {
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("myOverlay").style.display = "block";
+  }
+
+  function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("myOverlay").style.display = "none";
+  }
+  
+  var commentArray = {}
+  
+  function sendMessageFromChat(message) {
+      commentArray[id] = commentArray[id] + 1; 
+    
+      var jsobj = {comment:message,ismessage:true};
+      var messageJson = JSON.stringify(jsobj);
+      socket.send(messageJson);
+      
+      //get some info
+      //make it a json
+      //send to socket
+    }
   
 
     // setting up the canvas and one paper tool
@@ -154,7 +165,7 @@ function w3_close() {
    tool.onMouseDown = function(event){
 //       newpath = new paper.Path();
 //       paths[id] = newpath;
-      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor, newpath:true};
+      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor, newpath:true,ismessage:false};
       var myJSON = JSON.stringify(obj);
       socket.send(myJSON);       
     }  
@@ -162,10 +173,12 @@ function w3_close() {
     tool.onMouseDrag = function(event){
 //       newpath = new paper.Path();
 //       paths[id] = newpath;
-      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor,newpath:false};
+      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor,newpath:false,ismessage:false};
       var myJSON = JSON.stringify(obj);
       socket.send(myJSON);       
     }  
+    
+    
     
 
     // var socket = new WebSocket(
@@ -174,6 +187,19 @@ function w3_close() {
      socket.onmessage = function(receivedMessage) {
        
         var json = JSON.parse(receivedMessage.data);
+        var booleanmessage = json.ismessage;
+        if(booleanmessage == true){
+          var message = json.comment+'\n';
+//           alert(message);
+          var bar = document.getElementById('mySidebar');
+          var newContent = document.createTextNode(message); 
+          linebreak = document.createElement("br");
+      
+          // add the text node to the newly created div
+          bar.appendChild(newContent);
+          bar.appendChild(linebreak);
+        }
+       else{
         var posx = json.x;
         var posy = json.y;
         var myid = json.userid;
@@ -192,7 +218,7 @@ function w3_close() {
          allUserPath = paths;
 //          console.log("new");
        }
-       paths[myid].strokeWidth = 2;
+       paths[myid].strokeWidth = 3;
         if (isHide) {
           if (myid != id) {
             paths[myid].strokeColor = 'white';
@@ -204,7 +230,7 @@ function w3_close() {
        paths[myid].smooth();
        paths[myid].add(new paper.Point(posx,posy));
 
-    }
+    }}
      
 //      $(document).ready(() => {
 //       window.addEventListener('deviceorientation', (event) => {
