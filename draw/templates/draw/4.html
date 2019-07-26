@@ -1,0 +1,244 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>P4 Drawing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'draw/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+    <style type="text/css">
+      #myDIV {
+/*       border: 1px solid black; */
+      margin-bottom: 10px;
+      max-width:230px;  
+      }
+     
+      #myCanvas {
+     
+      background-color: black;
+       
+      background-image: url("/static/draw/images/slave-ship.jpg");
+      /* Center and scale the image nicely */
+     
+      width: 980px;
+      height: 598px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      }
+      body{
+        height:100%;
+        margin:0;
+      }
+      p{
+        border: 1px solid black;
+        margin-right:10px;
+        max-width:220px;
+        height: 100%;
+        overflow-wrap: break-word;
+        color: black;
+        }
+    </style>
+
+</head>
+<body class="w3-content" style="max-width:1200px; max-hight: 600px">
+   
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:260px" id="mySidebar">
+   <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+   
+   <div id="respond">
+      <div id="content"></div>
+        <div>
+            <form class=" w3-right w3-padding-24" onkeypress="return event.keyCode != 13">
+              <br> Comment:<br>
+              <input id = "comment" type="text" name="" value="" >
+             <i id="submitbtn" onclick="javascript:sendMessageFromChat(document.getElementById('comment').value)" class="fa fa-send w3-hide-large w3-button"></i>
+<!--               <btn id="submit"onclick="sendMessageFromChat(document.getElementById('comment').value);" class="fa fa-send w3-hide-large w3-button"></btn> -->
+<!--             <button id="submit" onclick="javascript:sendMessageFromChat(document.getElementById('comment').value);">Button</button>  -->
+              <br></br>
+          <div class="w3-left w3-padding-29"id="myDIV">
+<!--             <p>Only live comment are shown</p> -->
+          </div>  
+          </form>
+            
+            </div>
+        </div>
+</div>
+  
+  </nav>
+  <!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+<!--   <div class="w3-bar-item w3-padding-24 w3-wide">LOGO</div> -->
+ <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-left" onclick="w3_open()"><i class='far fa-comment-alt'></i></a>
+<!-- Use an element to toggle between a like/dislike icon -->
+
+  <div class= "w3-right"id="buttons">
+  <button class="w3-button w3-padding-24 " onclick="window.location.href = 'https://p3-websockets-zding52-zding52366227.codeanyapp.com/draw/3/';">&#10094; #3</button>
+ <i onclick="thumbFunction(this)" class="far fa-thumbs-up"></i>
+    <h id="test" style="color:white">0</h>
+    <button class="w3-button " onclick="plusDivs(-1)" style="font-size: 40px; font-color:white;">#4</button>
+  <button class="w3-button w3-padding-24" onclick="window.location.href = 'https://p3-websockets-zding52-zding52366227.codeanyapp.com/draw/5/';">#5&#10095;</button>
+</div>
+  </header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div> 
+    <canvas id="myCanvas" ></canvas>
+   
+</div>
+  </div>
+
+</body>
+</html>
+
+<script>
+  //   const node = document.getElementsByClassName(".input")[0];
+  // node.addEventListener("keyup", function(event) {
+  //     if (event.key === "Enter") {
+  //         alert("enter");
+  //     }
+  // });
+  var input = document.getElementById("comment");
+input.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   document.getElementById("submitbtn").click();
+  }
+});
+  
+  var thumbcount = 0;
+  function thumbFunction(x) { 
+    thumbcount+=1;  
+    var thumjs = {thumb:true,ismessage:false, mycolor:userColor,userid: id, thumbnum: thumbcount}
+    var messthumb = JSON.stringify(thumjs);
+    socket.send(messthumb);
+    changeText(thumbcount);
+  }
+  
+  // Accordion 
+  function myAccFunc() {
+    var x = document.getElementById("demoAcc");
+    if (x.className.indexOf("w3-show") == -1) {
+      x.className += " w3-show";
+    } else {
+      x.className = x.className.replace(" w3-show", "");
+    }
+  }
+  // Click on the "Jeans" link on page load to open the accordion for demo purposes
+  // document.getElementById("myBtn").click();
+  // Open and close sidebar
+  function w3_open() {
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("myOverlay").style.display = "block";
+  }
+  function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("myOverlay").style.display = "none";
+  }
+  function w3_open() {
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("myOverlay").style.display = "block";
+  }
+  function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("myOverlay").style.display = "none";
+  }
+  
+  function sendMessageFromChat(message) {
+    document.getElementById('comment').value='';
+    var jsobj = {comment:message, thumb:false, ismessage:true, mycolor:userColor}
+    var messageJson = JSON.stringify(jsobj);
+    socket.send(messageJson);
+    //get some info
+    //make it a json
+    //send to socket
+  }
+  function changeText(text) {
+    console.log(text);
+    document.getElementById('test').innerHTML = text;
+  }
+    // setting up the canvas and one paper tool
+    var canvas = document.getElementById('myCanvas');
+    var shake = false;
+    var lastGamma = 0;
+    var paths= {};
+    var allUserPath = {};
+    paper.setup(canvas);
+    var tool = new paper.Tool();
+    var id = Math.random()*360; 
+    var userColor = new paper.Color.random();
+    var url = window.location.href;
+    var isHide = false;
+    if (url.indexOf("hide") > -1) {
+      isHide = true;
+    } else if (url.indexOf("show") > -1) {
+      isHide = false;
+    } else {
+//   alert('<your url>:8000/draw/?type=hide or <your url>:8000/draw/?type=show');
+    }
+   tool.onMouseDown = function(event){
+      var obj = {x:event.point.x, y:event.point.y, userid: id, mycolor:userColor, newpath:true,ismessage:false};
+      var myJSON = JSON.stringify(obj);
+      socket.send(myJSON);       
+    }  
+    tool.onMouseDrag = function(event){
+      var obj = {x:event.point.x, y:event.point.y,thumb:false, userid: id, mycolor:userColor,newpath:false,ismessage:false};
+      var myJSON = JSON.stringify(obj);
+      socket.send(myJSON);       
+    }  
+    var socket = new WebSocket('wss://p3-websockets-zding52-zding52366227.codeanyapp.com/ws/draw');
+     socket.onmessage = function(receivedMessage) {
+        var json = JSON.parse(receivedMessage.data);
+        var mycolor = json.mycolor;
+        var booleanmessage = json.ismessage;
+        var booleanthumb = json.thumb;
+        if(booleanmessage == true){
+             var message = json.comment;
+             var para = document.createElement("p");
+             para.innerHTML = message;
+             document.getElementById("myDIV").append(para);
+        }else if(booleanthumb == true){
+             var countthumb = json.thumbnum;
+               thumbcount = countthumb;
+                changeText(thumbcount);
+                 }
+       else{
+        var posx = json.x;
+        var posy = json.y;
+        var myid = json.userid;
+       
+        var newp  = json.newpath;
+       if(newp == true){
+         newpath = new paper.Path();
+         paths[myid] = newpath;
+       }
+       if(!(myid in allUserPath)){
+         allUserPath = paths;
+       }
+       paths[myid].strokeWidth = 3;
+        if (isHide) {
+          if (myid != id) {
+            paths[myid].strokeColor = 'white';
+          } else {
+              paths[myid].strokeColor = new paper.Color(mycolor[1],mycolor[2],mycolor[3]);
+          }
+        } else { 
+       paths[myid].strokeColor = new paper.Color(mycolor[1],mycolor[2],mycolor[3]);}
+       paths[myid].smooth();
+       paths[myid].add(new paper.Point(posx,posy));
+    }}     
+</script>
+</html>
