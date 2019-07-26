@@ -18,15 +18,11 @@
     </script>
     <style type="text/css">
       #myDIV {
-      border: 1px solid black;
+/*       border: 1px solid black; */
       margin-bottom: 10px;
       max-width:230px;  
       }
-      .box{
-        border: 1px solid black;
-        background-color:white;
-        max-width:230px;
-      }
+     
       #myCanvas {
      
       background-color: black;
@@ -34,8 +30,8 @@
       background-image: url("/static/draw/images/19728.jpg");
       /* Center and scale the image nicely */
      
-         width: 980px;
-        height: 598px;
+      width: 980px;
+      height: 598px;
 
       background-position: center;
       background-repeat: no-repeat;
@@ -44,28 +40,37 @@
       body{
         height:100%;
         margin:0;
-        
-       
       }
+      p{
+        border: 1px solid black;
+        margin-right:10px;
+        max-width:220px;
+        height: 100%;
+        overflow-wrap: break-word;
+        color: black;
+        }
     </style>
 
 </head>
 <body class="w3-content" style="max-width:1200px; max-hight: 600px">
    
 <!-- Sidebar/menu -->
-<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:300px" id="mySidebar">
    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
   
    <div id="respond">
       <div id="content"></div>
         <div>
-            <form class=" w3-right w3-padding-29">
+            <form class=" w3-right w3-padding-24" onkeypress="return event.keyCode != 13">
               <br> Comment:<br>
               <input id = "comment" type="text" name="" value="" >
 <!--              <i onclick="javascript:sendMessageFromChat(document.getElementById('comment').value)" class="fa fa-send w3-hide-large w3-button"></i> -->
-             <i onclick="sendMessageFromChat(document.getElementById('comment').value);" class="fa fa-send w3-hide-large w3-button"></i>
+<!--              <btn id="submit"onclick="sendMessageFromChat(document.getElementById('comment').value);" class="fa fa-send w3-hide-large w3-button"></btn> -->
+           <button id="submit" onclick="sendMessageFromChat(document.getElementById('comment').value);">Button</button>
               <br></br>
-              <div class="w3-left  w3-padding-29"id="myDIV">  
+          <div class="w3-left w3-padding-29"id="myDIV">
+<!--             <p>Only live comment are shown</p> -->
+          </div>  
           </form>
             
             </div>
@@ -92,6 +97,7 @@
   </div>
   
 <script>
+  
 // Accordion 
 function myAccFunc() {
   var x = document.getElementById("demoAcc");
@@ -124,7 +130,12 @@ function w3_close() {
     
   </script>  
 <script>
-  
+//   const node = document.getElementsByClassName(".input")[0];
+// node.addEventListener("keyup", function(event) {
+//     if (event.key === "Enter") {
+//         alert("enter");
+//     }
+// });
    //side bar
   // Open and close sidebar
   function w3_open() {
@@ -201,18 +212,24 @@ function w3_close() {
      socket.onmessage = function(receivedMessage) {
        
         var json = JSON.parse(receivedMessage.data);
-        var color = json.mycolor;
+        var mycolor = json.mycolor;
         var booleanmessage = json.ismessage;
         if(booleanmessage == true){
-          var message = json.comment+'\n';
-          var bar = document.getElementById('myDIV');
-          var newContent = document.createTextNode(message); 
+//           var message = json.comment+'\n';
+//           var bar = document.getElementById('myDIV');
+//           var newContent = document.createTextNode(message); 
           
-          linebreak = document.createElement("br");
+//           linebreak = document.createElement("br");
            
-          // add the text node to the newly created div
-          bar.appendChild(newContent);
-          bar.appendChild(linebreak);
+//           // add the text node to the newly created div
+//           bar.appendChild(newContent);
+//           bar.appendChild(linebreak);
+             var message = json.comment;
+             
+             var para = document.createElement("p");
+//              para.fontcolor("blue");
+             para.innerHTML = message;
+             document.getElementById("myDIV").append(para);
         }
        else{
         var posx = json.x;
@@ -233,15 +250,34 @@ function w3_close() {
           if (myid != id) {
             paths[myid].strokeColor = 'white';
           } else {
-              paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);
+              paths[myid].strokeColor = new paper.Color(mycolor[1],mycolor[2],mycolor[3]);
           }
         } else {
-       paths[myid].strokeColor = new paper.Color(color[1],color[2],color[3]);}
+       paths[myid].strokeColor = new paper.Color(mycolor[1],mycolor[2],mycolor[3]);}
        paths[myid].smooth();
        paths[myid].add(new paper.Point(posx,posy));
 
     }}
-  
+     
+//     var input = document.getElementById("comment");
+//     input.addEventListener("keyup", function(event) {
+//       if (event.keyCode === 13) {
+//          event.preventDefault();
+//          document.getElementById("submit").click();
+         
+        
+//   }
+// });
+     
+//     document.getElementById("comment").addEventListener("keydown", function(e) {
+//     if (!e) { var e = window.event; }
+//     e.preventDefault(); // sometimes useful
+//     // Enter is pressed
+//     if (e.keyCode == 13) { sendMessageFromChat(document.getElementById('comment').value); }
+//       else{var inputform = document.getElementById("comment");
+//           inputform.append(e.value);
+//           }
+// });
    
 
 </script>
